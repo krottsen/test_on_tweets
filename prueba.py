@@ -1,4 +1,5 @@
 import streamlit as st
+!pip3 install snscrape
 import snscrape.modules.twitter as sntwitter
 import pandas as pd
 import numpy as np
