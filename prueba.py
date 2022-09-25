@@ -12,7 +12,7 @@ with st.form("my_form"):
 
     # Variable para tratar de hacerlo dinamico
     st.text("Ingrese los metodos requeridos para el proceso de extraccion de datos")
-    rango = st.text_input("Empresa", "@NetlifeEcuador", disabled=True)
+    rango = st.text_input("Empresa", "@NetlifeEcuador", disabled=False)
     # Para elegir un rango de fecha
     since = st.date_input("Desde:")
     until = st.date_input("Hasta:")
