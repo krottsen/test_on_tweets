@@ -573,8 +573,8 @@ if uploaded_file is not None:
     # fig.show()
 
     if st.button("Download PDF"):
-    with open(filename, 'rb') as f:
-        b = f.read()
+        with open(filename, 'rb') as f:
+            b = f.read()
     st.write("Here is your file: ", st.file_downloader("Download PDF", b, "t3.pdf"))
 
     # FUNCION PARA HACER EL PDF
