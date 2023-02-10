@@ -572,11 +572,10 @@ if uploaded_file is not None:
     st.pyplot(fig)
     # fig.show()
 
-    if st.button("Generate PDF"):
-        filename = "t4.pdf"
-        # generate_charts()
-        save_multi_image(filename)
-        st.success("Charts saved as PDF!")
+    if st.button("Download PDF"):
+    with open(filename, 'rb') as f:
+        b = f.read()
+    st.write("Here is your file: ", st.file_downloader("Download PDF", b, "t3.pdf"))
 
     # FUNCION PARA HACER EL PDF
 
