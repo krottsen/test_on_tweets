@@ -1,51 +1,3 @@
-# import streamlit as st
-# import snscrape.modules.twitter as sntwitter
-# import pandas as pd
-# import numpy as np
-
-# # st. es el nombre acortado dado a streamlit
-
-# # Para hacer un form y utilizar el boton submit y de esa forma evitar que se genere la tabla de forma automatica
-# with st.form("my_form"):
-#     # Extraccion max de tweets
-#     maxTweets = 50000
-
-#     # Variable para tratar de hacerlo dinamico
-#     st.text("Ingrese los metodos requeridos para el proceso de extraccion de datos")
-#     rango = st.text_input("Empresa", "@NetlifeEcuador", disabled=False)
-#     # Para elegir un rango de fecha
-#     since = st.date_input("Desde:")
-#     until = st.date_input("Hasta:")
-
-#     # boton, funciona con un if y por lo regular esta en falso
-#     # Concatenacion de texto
-#     result = st.form_submit_button("Generar reporte de sentimiento")
-#     if result:
-#         unirRango = f"{rango} since:{since} until:{until}"
-#     else:
-#         unirRango = f"{rango} since:{since} until:{until}"
-
-#     # Creating list to append tweet data to
-#     tweets_list2 = []
-
-#     # Using TwitterSearchScraper to scrape data and append tweets to list
-#     for i, tweet in enumerate(sntwitter.TwitterSearchScraper(unirRango).get_items()):
-#         if i > maxTweets:
-#             break
-#         tweets_list2.append(
-#             [tweet.date, tweet.user.username, tweet.content, tweet.sourceLabel]
-#         )
-
-#     # Creating a dataframe from the tweets list above
-#     tweets_df2 = pd.DataFrame(
-#         tweets_list2, columns=["Datetime", "Username", "Content", "Device"]
-#     )
-
-#     # Display first 5 entries from dataframe
-#     # tweets_df2.head()
-#     st.table(tweets_df2)
-
-# Test PDF
 import streamlit as st
 import numpy as np
 import pandas as pd
@@ -54,10 +6,16 @@ from matplotlib.backends.backend_pdf import PdfPages
 import seaborn as sns
 
 # from matplotlib.backends.backend_pdf import PdfPages
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 
-
+def save_multi_image(filename):
+    pp = PdfPages(filename)
+    fig_nums = plt.get_fignums()
+    figs = [plt.figure(n) for n in fig_nums]
+    for fig in figs:
+        pp.savefig(fig)
+    pp.close()
 
 
 uploaded_file = st.file_uploader("Elige un archivo csv")
@@ -551,15 +509,8 @@ if uploaded_file is not None:
             title="Combined Fuel Economy (2000-2020)",
         )
 
-    def save_multi_image(filename):
-        pp = PdfPages(filename)
-        fig_nums = plt.get_fignums()
-        figs = [plt.figure(n) for n in fig_nums]
-        for fig in figs:
-            pp.savefig(fig)
-        pp.close()
-    
     fig, ax = plt.subplots()
+
     fruits = ["apple", "blueberry", "cherry", "orange"]
     counts = [40, 100, 30, 55]
     bar_labels = ["red", "blue", "_red", "orange"]
@@ -572,7 +523,6 @@ if uploaded_file is not None:
     ax.legend(title="Fruit color")
     st.pyplot(fig)
     # fig.show()
-
     if st.button("Download PDF"):
         with open(filename, 'rb') as f:
             b = f.read()
