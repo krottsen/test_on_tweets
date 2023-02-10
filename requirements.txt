@@ -1,1 +1,2 @@
 snscrape==0.4.3.20220106
+matplotlib==3.6.3
