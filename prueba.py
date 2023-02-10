@@ -54,16 +54,10 @@ from matplotlib.backends.backend_pdf import PdfPages
 import seaborn as sns
 
 # from matplotlib.backends.backend_pdf import PdfPages
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 
-def save_multi_image(filename):
-    pp = PdfPages(filename)
-    fig_nums = plt.get_fignums()
-    figs = [plt.figure(n) for n in fig_nums]
-    for fig in figs:
-        pp.savefig(fig)
-    pp.close()
+
 
 
 uploaded_file = st.file_uploader("Elige un archivo csv")
@@ -557,8 +551,15 @@ if uploaded_file is not None:
             title="Combined Fuel Economy (2000-2020)",
         )
 
+    def save_multi_image(filename):
+        pp = PdfPages(filename)
+        fig_nums = plt.get_fignums()
+        figs = [plt.figure(n) for n in fig_nums]
+        for fig in figs:
+            pp.savefig(fig)
+        pp.close()
+    
     fig, ax = plt.subplots()
-
     fruits = ["apple", "blueberry", "cherry", "orange"]
     counts = [40, 100, 30, 55]
     bar_labels = ["red", "blue", "_red", "orange"]
