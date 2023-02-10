@@ -39,8 +39,8 @@ save_multi_image(filename)
 if st.button("Download PDF"):
     with open(filename, 'rb') as f:
         b = f.read()
-    b = b.decode("utf-8")
     st.write("Here is your file: ", st.file_downloader("Download PDF", b, "t3.pdf"))
+
 
 
 
