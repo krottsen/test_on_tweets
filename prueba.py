@@ -31,9 +31,10 @@ ax.bar(fruits, counts, label=bar_labels, color=bar_colors)
 ax.set_ylabel("fruit supply")
 ax.set_title("Fruit supply by kind and color")
 ax.legend(title="Fruit color")
+fig.show()
+st.pyplot(fig)
 
 save_multi_image(filename)
-st.pyplot(fig)
 
 if st.button("Download PDF"):
     with open(filename, 'rb') as f:
