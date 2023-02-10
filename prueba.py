@@ -8,7 +8,6 @@ import seaborn as sns
 # from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
 
-
 def save_multi_image(filename):
     pp = PdfPages(filename)
     fig_nums = plt.get_fignums()
@@ -18,7 +17,7 @@ def save_multi_image(filename):
     pp.close()
 
 
-
+filename = "t3.pdf"
 
 fig, ax = plt.subplots()
 
@@ -32,12 +31,16 @@ ax.bar(fruits, counts, label=bar_labels, color=bar_colors)
 ax.set_ylabel("fruit supply")
 ax.set_title("Fruit supply by kind and color")
 ax.legend(title="Fruit color")
+
+save_multi_image(filename)
 st.pyplot(fig)
-# fig.show()
+
 if st.button("Download PDF"):
-    with open(filename, 'rb') as f:
+    with open(filename, "rb") as f:
         b = f.read()
     st.write("Here is your file: ", st.file_downloader("Download PDF", b, "t3.pdf"))
+
+
 
     # FUNCION PARA HACER EL PDF
 
