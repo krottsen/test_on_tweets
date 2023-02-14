@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 # import snscrape.modules.twitter as sntwitter
 import re  # para expresiones regulares
 import matplotlib.pyplot as plt
-from pysentimiento import create_analyzer  # Para el analisis de sentimiento
+# from pysentimiento import create_analyzer  # Para el analisis de sentimiento
 # import nltk
 # from nltk.tokenize import word_tokenize
 # from nltk.corpus import stopwords
