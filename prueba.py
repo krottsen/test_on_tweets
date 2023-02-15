@@ -14,8 +14,8 @@ import matplotlib.pyplot as plt
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-# nltk.download('stopwords')
-# nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('punkt')
 stop_words = set(stopwords.words('spanish'))
 
 st.set_page_config(page_title="Tesis", layout="wide")
