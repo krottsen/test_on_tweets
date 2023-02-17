@@ -815,7 +815,7 @@ elif selected == "Dashboard":
 
             with gpol3:
                 maxProv = ubic["Location"].value_counts().keys().tolist()
-                numProv = st.multiselect('Elige la provincia:', maxProv, default=maxProv[3])
+                numProv = st.multiselect('Elige la provincia:', maxProv, default=maxProv[0])
 
                 for location in numProv:
                     lugar = location
