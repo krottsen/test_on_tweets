@@ -1147,9 +1147,9 @@ elif selected == "Dashboard":
 
                 st.plotly_chart(fig,use_container_width=True)
                 
-                # 3er bar tiempo del dia
+                # 3er bar meses
                 maxMes = mes["Mes"].value_counts().keys().tolist()
-                indMes = st.select_slider('Selecciona un tiempo del día:', 
+                indMes = st.select_slider('Selecciona un mes:', 
                                         #   maxMes,
                                         options=['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'])
                 def tolist(string):
