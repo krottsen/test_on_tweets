@@ -14,14 +14,9 @@ from pysentimiento import create_analyzer  # Para el analisis de sentimiento
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-
-@st.cache_resource
-def stopw():
-    nltk.download('stopwords')
-@st.cache_resource
-def nltkpunkt():
-    nltk.download('punkt')
-stop_words = set(stopw.words('spanish'))
+nltk.download('stopwords')
+nltk.download('punkt')
+stop_words = set(stopwords.words('spanish'))
 
 st.set_page_config(page_title="Tesis", layout="wide")
 st.markdown("<style>" + open("./style.css").read() + "</style>", unsafe_allow_html=True)
