@@ -28,7 +28,7 @@ st.title(
 selected = option_menu(
     None,
     ["Extraccion", "Dashboard"],
-    icons=["activity", "file-earmark-arrow-down", "file-bar-graph"],
+    icons=["file-earmark-arrow-down", "file-bar-graph"],
     menu_icon="cast",
     default_index=0,
     orientation="horizontal",
