@@ -1,18 +1,7 @@
-/* Elimina el header */
-/* header[data-testid='stHeader'] {
-  display: none;
-} */
+
 #dashboard-para-empresas-de-telecomunicaciones {
   text-align: center;
 }
-/* .stApp {
-  background-color: aqua;
-} */
-
-/* Es el espacio entre el menu y la informacion */
-/* div[data-testid='stVerticalBlock'] {
-  gap: 0rem;
-} */
 /* Hace que el contenedor ocupe el espacio del header eliminado */
 .css-k1ih3n {
   width: 100%;
@@ -34,14 +23,10 @@
   margin-bottom: 10px;
 }
 .test1 {
-  /* outline: 1px solid red; */
   display: flex;
   justify-content: center;
   text-align: center;
   border-bottom: 0;
-  /* background-color: #3178c6; */
-  /* border-top-left-radius: 50%;
-  border-top-right-radius: 50%; */
   border-bottom-left-radius: 25%;
   border-bottom-right-radius: 25%;
 }
@@ -49,17 +34,10 @@
   text-align: center;
   padding: 0;
   margin-top: 5px;
-  /* padding-top: 5px; */
-  /* border-bottom-left-radius: 50%;
-  border-bottom-right-radius: 50%; */
-  /* background-color: #3178c6; */
   border-top: 0;
-  /* color: white; */
 }
 .par {
-  /* font-weight: bold; */
   font-size: larger;
-  /* color: white; */
 }
 .logo {
   width: 6rem;
@@ -68,8 +46,6 @@
   display: flex;
   flex-direction: column;
   margin-top: 2px;
-  /* outline: 1px solid red; */
   align-items: center;
   justify-content: center;
 }
-/* aqui termina */
