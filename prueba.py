@@ -10,7 +10,7 @@ import plotly.graph_objects as go # grafico
 import snscrape.modules.twitter as sntwitter # modulo tw
 import re  # para expresiones regulares
 import matplotlib.pyplot as plt
-# from pysentimiento import create_analyzer  # Para el analisis de sentimiento
+from pysentimiento import create_analyzer  # Para el analisis de sentimiento
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
@@ -27,7 +27,7 @@ st.title(
 # TODO: Menu horizontal
 selected = option_menu(
     None,
-    ["Inicio", "Extraccion", "Dashboard"],
+    ["Extraccion", "Dashboard"],
     icons=["activity", "file-earmark-arrow-down", "file-bar-graph"],
     menu_icon="cast",
     default_index=0,
@@ -39,11 +39,7 @@ selected = option_menu(
     },
 )
 
-
-if selected == "Inicio":
-    st.title("Inicio")
-
-elif selected == "Extraccion":
+if selected == "Extraccion":
 
     # Sirve para generar la fecha actual en el boton de submit para que no vuelva a iterarse
     today = date.today()
@@ -51,7 +47,7 @@ elif selected == "Extraccion":
     # Para hacer un form y utilizar el boton submit y de esa forma evitar que se genere la tabla de forma automatica
     with st.form("my_form"):
         # Extraccion max de tweets
-        maxTweets = 50000
+        maxTweets = 100000
         st.subheader(
             "Ingrese los métodos requeridos para el proceso de extracción de datos"
         )
@@ -81,10 +77,14 @@ elif selected == "Extraccion":
             unirRango = f"{today.day} since:{today.month} until:{today.year}"
 
         
-        import time
-
-        start = time.time()
+        # import time
+        # start = time.time()
         # Your code here
+        # Tiempo de ejecucion
+        # x = [i**2 for i in range(1000000)]
+        # end = time.time()
+        # st.info(f"Tiempo de ejecutar el analisis: {end - start} segundos")
+        
         # Creating list to append tweet data to
         tweets_list = []
 
@@ -124,6 +124,49 @@ elif selected == "Extraccion":
             ],
         )
 
+        # Limpia el texto
+        def limpiarTweets(text):    
+            # convierte el texto a minuscula
+            text = text.lower()
+            # remueve enlaces
+            text = re.sub(r"https\S+|www\S+https\S+", '',text, flags=re.MULTILINE)
+            # remueve el usuario con @
+            text = re.sub(r'@[A-Za-z09-_-_0-_9]+', '', text)
+            # remueve los #   
+            text = re.sub(r'#[A-Za-z09]+', '', text)
+            # remueve los numeros
+            text = re.sub(r'[0-9]\S+', r'', text)
+            # remueve emojis y signos de puntuacion
+            text = re.sub(r'[^\w\s]','',text)
+            text = re.sub(r'RT[\s]+', '', text)
+            
+            return text
+        
+        tweets_df['Text_limpio'] = tweets_df['Text'].apply(limpiarTweets)
+        
+        # Para el analisis de sentimiento
+        @st.cache_resource  
+        def analisisEsp():
+            return create_analyzer(task="sentiment", lang="es")
+        analyzer = analisisEsp()
+        
+        def wordSentiment(text):
+            text = str(analyzer.predict(text))
+            text = text[22:25]
+            return text
+        
+        ## Aplicar la funcion wordSentiment
+        tweets_df['Sentimiento'] = tweets_df['Text_limpio'].apply(wordSentiment)
+        
+        # Crear un dic para poner los resultados en esp
+        palabra_com = {
+            'POS' : 'Positivo',
+            'NEG' : 'Negativo',
+            'NEU' : 'Neutral'
+        }
+        
+        tweets_df['Sentimiento'] = tweets_df['Sentimiento'].map(palabra_com)
+        
         # Crear un nuevo df para mostrar las cols principales
         mainCols = tweets_df[
             [
@@ -132,16 +175,16 @@ elif selected == "Extraccion":
                 "Location",
                 "Device",
                 "Text",
+                'Sentimiento'
             ]
         ]
 
         # Muestra el df
         st.dataframe(mainCols, use_container_width=True)
-        # Tiempo de ejecucion
-        x = [i**2 for i in range(1000000)]
-        end = time.time()
-        st.info(f"Tiempo de ejecutar el analisis: {end - start} segundos")
-        # st.write("Tiempo de ejecutar el analisis:", end - start, "segundos")
+        
+        # Genera un mensaje diciendo la cantidad de tws extraidos 
+        if len(tweets_df) > 0:
+            st.success(f'Se extrajeron {len(tweets_df)} tweets', icon='✅') 
         
 
     # Agrega automaticamente el nombre del archivo dependiendo las variables ingresadas en el form
@@ -164,6 +207,7 @@ elif selected == "Extraccion":
             file_name=f"{filename}.csv",
             mime="text/csv",
         )
+
     
 # ---------------------------------------------------------------------------------------------------------
 
@@ -237,6 +281,9 @@ elif selected == "Dashboard":
             st.title("")
             
         
+        # Eliminar los tweets de la empresa
+        df = df[df['Username'] != empresa[0]]
+        
         # Crear una variable para saber cuantas opciones hay para los graficos
         pola = df["Sentimiento"].value_counts().keys().tolist()
 
@@ -244,7 +291,11 @@ elif selected == "Dashboard":
         with st.expander("Polaridad", expanded=True):
             # Cantidad de tweets extraidos
             cantidad = len(df)
-            st.info(f'Cantidad de tweets analizados: {cantidad}', icon="🤖")
+            t1,t2 = st.columns(2)
+            with t1:
+                st.info('Categorización de los sentimientos en base a los tweets de los usuarios', icon="✅")
+            with t2:
+                st.success(f'Cantidad de tweets analizados: {cantidad}', icon="🤖",)
             gnew1, gnew2, gnew3 = st.columns(3)
             with gnew2:
                 sentiment_counts = df['Sentimiento'].value_counts()
@@ -722,7 +773,8 @@ elif selected == "Dashboard":
         with st.expander("Ubicacion", expanded=True):
             # NaN values de usuarios sin ubicacion
             nanVal = df["Location"].isnull().sum()
-            st.warning(f" Existen {nanVal} personas que no cuentan con una ubicación en Twitter", icon='⚠️')
+            porc = round((100-(nanVal*100)/cantidad), 2)
+            st.warning(f"De {cantidad} tweets,  existen {nanVal} usuarios que no cuentan con una ubicación en Twitter, lo que quiere decir que solo el {porc}% de tweets están siendo procesados para realizar las gráficas", icon='⚠️')
             gpol1, gpol2, gpol3  = st.columns([1,3,1])
             
             with gpol2:
@@ -881,18 +933,18 @@ elif selected == "Dashboard":
         df['Mes'] = df['Mes'].map(meses)
         df['Hora'] = df['Hora'].map(horaPal)
         
-        
         # DF con el que se trabaja
         date = df[['Sentimiento','Dias']]
         mes = df[['Mes','Sentimiento']]
         hr = df[['Hora','Sentimiento']]
         
         with st.expander("Fecha",expanded=True):
-            day1, day2, day3  = st.columns([3, 1, 1])
+            day1, day2  = st.columns([3, 1])
             
             with day1:
                 
-                # 1er grafico linea
+                # 1er grafico 
+                st.info('Muestra los gráficos de manera completa', icon='🚨')
                 day_of_week_sentiments = date.groupby(['Dias', 'Sentimiento']).size().reset_index(name='counts')
                 day_of_week_sentiments = day_of_week_sentiments.pivot(index='Dias', columns='Sentimiento', values='counts')
                 day_of_week_sentiments = day_of_week_sentiments.reindex(['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'])
@@ -968,7 +1020,7 @@ elif selected == "Dashboard":
                 
                 fig.update_layout(title='Días de la semana', yaxis_title='Porcentaje %', yaxis_title_font_size=20, 
                                 width=500,height=500,
-                                # paper_bgcolor="skyblue", 
+                                paper_bgcolor="skyblue", 
                                 margin=dict(l=0,r=0,b=20,t=30,pad=0),)
                 
                 st.plotly_chart(fig, use_container_width=True)
@@ -983,7 +1035,7 @@ elif selected == "Dashboard":
                 hrValues = hrValues.reindex(['Mañana','Tarde','Noche','Madrugada'])
 
                 # Plot the line chart for the sentiments
-                fig, ax = plt.subplots(figsize=(10,4.9))
+                fig, ax = plt.subplots(figsize=(10,3.94))
                 hrValues.plot(kind='area',ax=ax, stacked=False, color=['crimson','gray','#2ca02c'])
 
                 # Obtiene el maximo valor de los sentimientos
@@ -1017,8 +1069,30 @@ elif selected == "Dashboard":
                 ax.tick_params(axis='x', rotation=0)
                 fig.tight_layout()
                 st.pyplot(fig)
+                
+                # 3er grafico barh
+                mesValues = mes.groupby(['Mes', 'Sentimiento']).size().reset_index(name='counts')
+                mesValues = mesValues.pivot(index='Mes', columns='Sentimiento', values='counts')
+                mesValues = mesValues.divide((mesValues.sum(axis=1)/100), axis=0)
+                
+                fig = px.bar(mesValues,orientation='h' ,barmode='group',color_discrete_map={'Negativo': 'crimson', 'Neutral': 'gray', 'Positivo': '#2ca02c'},
+                            text_auto=True, 
+                            )
+                fig.update_traces(marker_line_color='black', marker_line_width=1.5, opacity=1, texttemplate='%{value:.1f}%')
+                fig.update_layout(
+                    title='Meses del año',
+                    xaxis=dict(title="", tickangle=0, tickfont=dict(size=18)),
+                    yaxis=dict(title=""),
+                    height=507,
+                    paper_bgcolor="skyblue",
+                    margin=dict(l=0,r=0,b=0,t=30,pad=0)
+                )
+                st.plotly_chart(fig,use_container_width=True)
+                
             
             with day2:
+                
+                st.info('Muestra los gráficos de manera individual', icon='🚨')
                 # 1er bar Dias
                 maxDia = date["Dias"].value_counts().keys().tolist()
                 indDia = st.select_slider('Selecciona un día:', maxDia)
@@ -1041,7 +1115,7 @@ elif selected == "Dashboard":
                     yaxis=dict(title="", tickfont=dict(size=12)),
                     margin=dict(l=0, r=0, t=0, b=0 ,pad=0),
                     height=397,
-                    # paper_bgcolor="skyblue",
+                    paper_bgcolor="skyblue",
                 )
 
                 st.plotly_chart(fig,use_container_width=True)
@@ -1068,7 +1142,7 @@ elif selected == "Dashboard":
                     yaxis=dict(title="", tickfont=dict(size=12)),
                     margin=dict(l=0, r=0, t=0, b=0 ,pad=0),
                     height=397,
-                    # paper_bgcolor="skyblue",
+                    paper_bgcolor="skyblue",
                 )
 
                 st.plotly_chart(fig,use_container_width=True)
@@ -1083,7 +1157,7 @@ elif selected == "Dashboard":
                     return li
                 liHr = tolist(indMes)
                 sel_mes = mes[mes['Mes'].isin(liHr)]
-                mesValues =mes.groupby(['Mes', 'Sentimiento']).size().reset_index(name='counts')
+                mesValues =sel_mes.groupby(['Mes', 'Sentimiento']).size().reset_index(name='counts')
                 mesValues = mesValues.pivot(index='Mes', columns='Sentimiento', values='counts')
                 
                 fig = px.bar(mesValues, barmode='group',color_discrete_map={'Negativo': 'crimson', 'Neutral': 'gray', 'Positivo': '#2ca02c'},
@@ -1097,78 +1171,57 @@ elif selected == "Dashboard":
                     yaxis=dict(title="", tickfont=dict(size=12)),
                     margin=dict(l=0, r=0, t=0, b=0 ,pad=0),
                     height=397,
-                    # paper_bgcolor="skyblue",
+                    paper_bgcolor="skyblue",
                 )
 
                 st.plotly_chart(fig,use_container_width=True)
-                        
-            with day3:
-                # Positive chart
-                day_of_week_sentiments = date.groupby(['Dias', 'Sentimiento']).size().reset_index(name='counts')
-                day_of_week_sentiments = day_of_week_sentiments.pivot(index='Dias', columns='Sentimiento', values='counts')
-                day_of_week_sentiments = day_of_week_sentiments.reindex(['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'])
-                day_of_week_sentiments = day_of_week_sentiments[['Positivo']]
-                fig = px.line(day_of_week_sentiments, x=day_of_week_sentiments.index, y='Positivo')
-                fig.add_trace(go.Scatter(x=day_of_week_sentiments.index, y=day_of_week_sentiments['Positivo'], name="Positivo", line=dict(color='#2ca02c')))
-                fig.update_layout(title="Días de la semana",height=500, xaxis=dict(title=""), yaxis=dict(title=""),
-                                #   paper_bgcolor="skyblue",
-                                    legend=dict(orientation="h", x=0.5, xanchor='center', y=1.095, yanchor='middle',
-                                            font=dict(family="Source Sans Pro", size=14),))
-                
-                st.plotly_chart(fig,use_container_width=True)
-                
-                # Negative chart
-                day_of_week_sentiments = date.groupby(['Dias', 'Sentimiento']).size().reset_index(name='counts')
-                day_of_week_sentiments = day_of_week_sentiments.pivot(index='Dias', columns='Sentimiento', values='counts')
-                day_of_week_sentiments = day_of_week_sentiments.reindex(['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'])
-                day_of_week_sentiments = day_of_week_sentiments[['Negativo']]
-                fig = px.line(day_of_week_sentiments, x=day_of_week_sentiments.index, y='Negativo')
-                fig.add_trace(go.Scatter(x=day_of_week_sentiments.index, y=day_of_week_sentiments['Negativo'], name="Negativo", line=dict(color='crimson')))
-                fig.update_layout(title="Días de la semana", height=500, xaxis=dict(title=""), yaxis=dict(title=""),
-                                #   paper_bgcolor="skyblue",
-                                    legend=dict(orientation="h", x=0.5, xanchor='center', y=1.095, yanchor='middle',
-                                            font=dict(family="Source Sans Pro", size=14),))
-                st.plotly_chart(fig,use_container_width=True)
-                
-                # Neutral chart
-                day_of_week_sentiments = date.groupby(['Dias', 'Sentimiento']).size().reset_index(name='counts')
-                day_of_week_sentiments = day_of_week_sentiments.pivot(index='Dias', columns='Sentimiento', values='counts')
-                day_of_week_sentiments = day_of_week_sentiments.reindex(['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'])
-                day_of_week_sentiments = day_of_week_sentiments[['Neutral']]
-                fig = px.line(day_of_week_sentiments, x=day_of_week_sentiments.index, y='Neutral')
-                fig.add_trace(go.Scatter(x=day_of_week_sentiments.index, y=day_of_week_sentiments['Neutral'], name="Neutral", line=dict(color='gray')))
-                fig.update_layout(title="Días de la semana", height=500, xaxis=dict(title=""), yaxis=dict(title=""),
-                                #   paper_bgcolor="skyblue",
-                                    legend=dict(orientation="h", x=0.5, xanchor='center', y=1.095, yanchor='middle',
-                                            font=dict(family="Source Sans Pro", size=14),))
-                st.plotly_chart(fig,use_container_width=True)
-                
+
         with st.expander("Dispositivos",expanded=True):
-            
-            # 
-            dev = {
-                'Twitter for Android' : 'Twitter for Android',
-                'Twitter for iPhone': 'Twitter for iPhone',
-                'Twitter Web App' : 'Twitter Web App'
-            }
-            
-            df['Device']=df['Device'].map(dev)
-            
+        
             disp = df[["Device", "Sentimiento"]]
-            device_sentiments = disp.groupby(['Device', 'Sentimiento']).size().reset_index(name='counts')
-            device_sentiments = device_sentiments.pivot(index='Device', columns='Sentimiento', values='counts')
-            device_sentiments = device_sentiments.divide((device_sentiments.sum(axis=1)/100), axis=0)
-            
+            disp1, disp2 = st.columns([3,1])
+            with disp1:
+                mainDisp = disp["Device"].value_counts().keys().tolist()
 
-            fig = px.bar(device_sentiments, color_discrete_map={'Negativo': 'crimson', 'Neutral': 'gray', 'Positivo': '#2ca02c'}, orientation='h',text_auto=True)
-            
-            fig.update_traces(marker_line_color='black', marker_line_width=1.5, opacity=1)
-            fig.update_layout(barmode='stack', xaxis_title='Porcentaje %', yaxis_title='', title='', legend_title='Sentimiento')
+                # Select the locations you want to show the chart for
+                tdisp = mainDisp[0:3] if len(mainDisp) == 3 else mainDisp[0:3]
+                disp_ind = tdisp
+                device_sentiments = disp.groupby(['Device', 'Sentimiento']).size().reset_index(name='counts')
+                device_sentiments = device_sentiments.pivot(index='Device', columns='Sentimiento', values='counts')
+                device_sentiments = device_sentiments.divide((device_sentiments.sum(axis=1)/100), axis=0)
+                fig = px.bar(device_sentiments.loc[disp_ind], color_discrete_map={'Negativo': 'crimson', 'Neutral': 'gray', 'Positivo': '#2ca02c'}, orientation='h',text_auto=True,)
+                
+                fig.update_traces(marker_line_color='black', marker_line_width=1.5, opacity=1, texttemplate='%{value:.1f}%')
+                fig.update_layout(barmode='stack', xaxis_title='Porcentaje %', yaxis_title='', title='Dispositivos', legend_title='Sentimiento',
+                    paper_bgcolor="skyblue",
+                    height=500,)
 
-            st.plotly_chart(fig,use_container_width=True)    
+                st.plotly_chart(fig,use_container_width=True)    
 
-            # st.write(df['Device'].value_counts())
-            # st.dataframe(df)
+            with disp2:
+                # 2do chart
+                mainDisp2 = disp["Device"].value_counts().keys().tolist()
+                indDisp = st.select_slider('Selecciona un dispositivo:', mainDisp2)
+                def tolist(string):
+                    lid = list(string.split(","))
+                    return lid
+                lid = tolist(indDisp)
+                sel_disp = disp[disp['Device'].isin(lid)]
+                device_sentiments = sel_disp.groupby(['Device', 'Sentimiento']).size().reset_index(name='counts')
+                device_sentiments = device_sentiments.pivot(index='Device', columns='Sentimiento', values='counts')
+                
+                fig = px.bar(device_sentiments, barmode='group',color_discrete_map={'Negativo': 'crimson', 'Neutral': 'gray', 'Positivo': '#2ca02c'}, text_auto=True,)
+                fig.update_traces(marker_line_color='black', marker_line_width=1.5, opacity=1)
+                fig.update_layout(
+                    legend=dict(title="", font=dict(size=10), orientation="h", x=0.5, xanchor='center', y=-0.12, yanchor='middle',),
+                    xaxis=dict(title="", tickangle=0, tickfont=dict(size=18)),
+                    yaxis=dict(title="", tickfont=dict(size=12)),
+                    margin=dict(l=0, r=0, t=0, b=0 ,pad=0),
+                    height=397,
+                    paper_bgcolor="skyblue",
+                )
+
+                st.plotly_chart(fig,use_container_width=True)
             
         with st.expander("Frecuencia de Palabras",expanded=True):
             # Add palabras al stopwords
