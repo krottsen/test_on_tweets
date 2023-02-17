@@ -16,10 +16,12 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 
 @st.cache_resource
-def load_model():
+def stopw():
     nltk.download('stopwords')
+@st.cache_resource
+def nltkpunkt():
     nltk.download('punkt')
-stop_words = set(stopwords.words('spanish'))
+stop_words = set(stopw.words('spanish'))
 
 st.set_page_config(page_title="Tesis", layout="wide")
 st.markdown("<style>" + open("./style.css").read() + "</style>", unsafe_allow_html=True)
