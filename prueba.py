@@ -14,8 +14,11 @@ from pysentimiento import create_analyzer  # Para el analisis de sentimiento
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-nltk.download('stopwords')
-nltk.download('punkt')
+
+@st.cache_resource
+def load_model():
+    nltk.download('stopwords')
+    nltk.download('punkt')
 stop_words = set(stopwords.words('spanish'))
 
 st.set_page_config(page_title="Tesis", layout="wide")
@@ -1226,7 +1229,7 @@ elif selected == "Dashboard":
         with st.expander("Frecuencia de Palabras",expanded=True):
             # Add palabras al stopwords
             elimiar_es = [
-                'q','gran','ing','dientes','carlos','parte','usuarios','pepin','siga','septiembre','carbensemix','oracle','trae','mayo','sectores','labor'  'alianza','gerente','nacional','compañeros','junto','juntos','migración','pensamosenti','suárez','año','si','cada','vez','d','x','hoy'    'provincia','punta','muchas','ahora','abril','enero','febrero','junio','julio','agosto','marzo','octubre','noviembre','diciembre','así','mas'   'galápagos','siempre','clientes','presente','país','puerta','todossomoscnt','cntep','adelante','2','3','4','5','6','7','8','9','0','solo'  'días','día','van','dan','hace','ustedes','señores'
+                'q','gran','ing','dientes','carlos','parte','usuarios','pepin','siga','septiembre','carbensemix','oracle','trae','mayo','sectores','labor', 'alianza','gerente','nacional','compañeros','junto','juntos','migración','pensamosenti','suárez','año','si','cada','vez','d','x','hoy', 'provincia','punta','muchas','ahora','abril','enero','febrero','junio','julio','agosto','marzo','octubre','noviembre','diciembre','así','mas', 'galápagos','siempre','clientes','presente','país','puerta','todossomoscnt','cntep','adelante','2','3','4','5','6','7','8','9','0','solo', 'días','día','van','dan','hace','ustedes','señores'
             ]
 
             stop_words = nltk.corpus.stopwords.words('spanish')
