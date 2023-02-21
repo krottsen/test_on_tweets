@@ -285,10 +285,10 @@ elif selected == "Dashboard":
         df = df[df['Username'] != empresa[0]]
         
         # Crear una variable para saber cuantas opciones hay para los graficos
-        pola = df["Sentimiento"].value_counts().keys().tolist()
+        # pola = df["Sentimiento"].value_counts().keys().tolist()
 
         # Crear un expander y dentro el pie chart
-        with st.expander("Polaridad", expanded=True):
+        with st.expander("Polaridad", expanded=False):
             # Cantidad de tweets extraidos
             cantidad = len(df)
             t1,t2 = st.columns(2)
@@ -770,7 +770,7 @@ elif selected == "Dashboard":
         ubic = df[["Location", "Sentimiento"]]
         ubicReg = df[["Region", "Sentimiento"]]
         
-        with st.expander("Ubicacion", expanded=True):
+        with st.expander("Ubicacion", expanded=False):
             # NaN values de usuarios sin ubicacion
             nanVal = df["Location"].isnull().sum()
             porc = round((100-(nanVal*100)/cantidad), 2)
@@ -920,7 +920,7 @@ elif selected == "Dashboard":
             '15':'Mañana',
             '16':'Mañana',
             '17':'Tarde',
-            '13':'Tarde',
+            '18':'Tarde',
             '19':'Tarde',
             '20':'Tarde',
             '21':'Tarde',
@@ -938,7 +938,7 @@ elif selected == "Dashboard":
         mes = df[['Mes','Sentimiento']]
         hr = df[['Hora','Sentimiento']]
         
-        with st.expander("Fecha",expanded=True):
+        with st.expander("Fecha",expanded=False):
             day1, day2  = st.columns([3, 1])
             
             with day1:
@@ -1176,7 +1176,7 @@ elif selected == "Dashboard":
 
                 st.plotly_chart(fig,use_container_width=True)
 
-        with st.expander("Dispositivos",expanded=True):
+        with st.expander("Dispositivos",expanded=False):
         
             disp = df[["Device", "Sentimiento"]]
             disp1, disp2 = st.columns([3,1])
@@ -1223,7 +1223,7 @@ elif selected == "Dashboard":
 
                 st.plotly_chart(fig,use_container_width=True)
             
-        with st.expander("Frecuencia de Palabras",expanded=True):
+        with st.expander("Frecuencia de Palabras",expanded=False):
             # Add palabras al stopwords
             elimiar_es = [
                 'q','gran','ing','dientes','carlos','parte','usuarios','pepin','siga','septiembre','carbensemix','oracle','trae','mayo','sectores','labor', 'alianza','gerente','nacional','compañeros','junto','juntos','migración','pensamosenti','suárez','año','si','cada','vez','d','x','hoy', 'provincia','punta','muchas','ahora','abril','enero','febrero','junio','julio','agosto','marzo','octubre','noviembre','diciembre','así','mas', 'galápagos','siempre','clientes','presente','país','puerta','todossomoscnt','cntep','adelante','2','3','4','5','6','7','8','9','0','solo', 'días','día','van','dan','hace','ustedes','señores'
