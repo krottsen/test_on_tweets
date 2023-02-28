@@ -1,2 +1,19 @@
-# test_on_tweets
-Por ahora solo sirve para extraer tweets, range(50000)
+# Dashboard - test_on_tweets 
+Dashboard para empresas de telecomunicaciones 
+
+## Funciones
+- Permite extraer 100000 tweets 
+- Analizar el sentimiento
+- Descargar el archivo
+- Visualizar la información
+
+
+| Feature       | Library           | Chart | Type         |
+| :---          |    :----:        | :---: |  :----:     |
+| Sentiment     | Plotly            | 1     | Pie         |
+| Location      | Plotly-Matplotlib | 3     | Donut       |
+| Date          | Plotly-Matplotlib | 6     | Line-Bar-Area|
+| Device        | Plotly            | 2     | Horizontal Bar-Bar|
+| Word Frequency| Matplotlib        | 1     | Pie         |
+ 
+
