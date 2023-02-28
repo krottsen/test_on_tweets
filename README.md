@@ -1,7 +1,5 @@
 # Dashboard - test_on_tweets 
 Dashboard para empresas de telecomunicaciones 
-
-## Funciones
 - Permite extraer 100000 tweets 
 - Analizar el sentimiento
 - Descargar el archivo
