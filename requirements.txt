@@ -5,5 +5,5 @@ pysentimiento==0.5.2
 streamlit-option-menu==0.3.2
 matplotlib==3.6.3
 plotly==5.13.0
-numpy==1.21.6
+numpy==1.22
 pandas==1.4.4
