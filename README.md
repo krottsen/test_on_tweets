@@ -14,4 +14,5 @@ Dashboard para empresas de telecomunicaciones
 | Device        | Plotly            | 2     | Horizontal Bar-Bar|
 | Word Frequency| Matplotlib        | 1     | Pie         |
  
-
+Pagina de Streamlit:
+[https://empresatelecomunciaciones-daashboard.streamlit.app/](https://empresatelecomunciaciones-daashboard.streamlit.app/)
